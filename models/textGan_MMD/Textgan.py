@@ -92,6 +92,10 @@ class TextganMmd(Gan):
                            num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
+        from utils.metrics.Bleu import Bleu
+        bleu = Bleu(test_text=self.oracle_file, real_text=self.generator_file, gram=3)
+        self.add_metric(bleu)
+
     def train_discriminator(self):
         for _ in range(3):
             x_batch, z_h = self.generator.generate(self.sess, True)
@@ -322,6 +326,10 @@ class TextganMmd(Gan):
         inll.set_name('nll-test')
         self.add_metric(inll)
 
+        from utils.metrics.Bleu import Bleu
+        bleu = Bleu(test_text=self.oracle_file, real_text=self.generator_file, gram=3)
+        self.add_metric(bleu)
+
     def train_real(self, data_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized
@@ -345,8 +353,8 @@ class TextganMmd(Gan):
 
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 80
-        self.adversarial_epoch_num = 100
+        self.pre_epoch_num = 10 #80
+        self.adversarial_epoch_num = 10 # 100
         self.log = open('experiment-log-textgan-real.csv', 'w')
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
@@ -382,6 +390,7 @@ class TextganMmd(Gan):
             self.add_epoch()
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+                get_real_test_file()
                 self.evaluate()
 
             for _ in range(15):

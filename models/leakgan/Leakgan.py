@@ -485,7 +485,8 @@ class Leakgan(Gan):
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
                                          self.generator_file)
                     get_real_test_file()
-                    # self.evaluate()
+                    self.evaluate()
+
             for epoch_ in range(5):
                 print('epoch:' + str(epoch) + '--' + str(epoch_))
                 self.train_discriminator()
